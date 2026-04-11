@@ -7,10 +7,9 @@ export default defineConfig({
     port: 3030,
     proxy: {
       '/api': {
-        target: 'https://lesley-phialine-subtilely.ngrok-free.dev',
+        target: 'https://clippingapi-production.up.railway.app',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
-        headers: { 'ngrok-skip-browser-warning': 'true' },
       },
     },
   },

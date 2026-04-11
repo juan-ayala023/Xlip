@@ -194,7 +194,6 @@ export default function Dashboard() {
           file_name,
           prompt_id: config.prompt_id,
           language_id: config.language_id,
-          format: config.format,
         })
       }
 

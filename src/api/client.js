@@ -123,11 +123,11 @@ export async function uploadToPresignedUrl(uploadUrl, file, onProgress) {
   })
 }
 
-export async function initProcess(video_id, { file_name, prompt_id, language_id, format }) {
+export async function initProcess(video_id, { file_name, prompt_id, language_id }) {
   const res = await request(`/videos/ready/${video_id}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ file_name, prompt_id, language_id, format }),
+    body: JSON.stringify({ file_name, prompt_id, language_id }),
   })
   if (!res.ok) throw new Error('Error al iniciar el procesamiento')
   return res.json()
