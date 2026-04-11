@@ -49,7 +49,11 @@ export default function Dashboard() {
   const [clips, setClips] = useState(() => {
     try {
       const saved = localStorage.getItem('xlip_clips')
-      return saved ? JSON.parse(saved).filter(c => c.status === 'completed') : []
+      if (!saved) return []
+      const parsed = JSON.parse(saved).filter(c => c.status === 'completed')
+      // Dedup by id in case an older build persisted duplicates
+      const seen = new Set()
+      return parsed.filter(c => (seen.has(c.id) ? false : (seen.add(c.id), true)))
     } catch { return [] }
   })
   const [selectedClip, setSelectedClip] = useState(null)
@@ -114,11 +118,17 @@ export default function Dashboard() {
     clearInterval(pollTimerRef.current)
     pollingRef.current = { videoId, pendingIds }
 
+    // Guard against concurrent poll invocations racing past the Done branch
+    let finished = false
+
     async function poll() {
+      if (finished) return
       try {
         const { status } = await getVideoStatus(videoId)
+        if (finished) return
 
         if (status === 'Done' || status === 'done' || status === 'completed') {
+          finished = true
           clearInterval(pollTimerRef.current)
           clearInterval(progressTimerRef.current)
 
@@ -126,14 +136,18 @@ export default function Dashboard() {
           const realClips = normalizeClips(doneData, videoId)
 
           setClips(prev => {
-            // Remove pending placeholders, prepend real clips
+            // Remove pending placeholders
             const rest = prev.filter(c => !pendingIds.includes(c.id))
-            return [...realClips, ...rest]
+            // Dedup: drop any real clip whose id already exists in the list
+            const existingIds = new Set(rest.map(c => c.id))
+            const fresh = realClips.filter(c => !existingIds.has(c.id))
+            return [...fresh, ...rest]
           })
           return
         }
 
         if (status === 'Error' || status === 'error' || status === 'failed') {
+          finished = true
           clearInterval(pollTimerRef.current)
           clearInterval(progressTimerRef.current)
           setClips(prev => prev.map(c =>
