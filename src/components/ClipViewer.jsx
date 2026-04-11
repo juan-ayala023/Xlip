@@ -58,51 +58,24 @@ export default function ClipViewer({ clip, onClose }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-xborder">
           {/* Left: Video preview */}
           <div className="p-6">
-            {/* Mock video player */}
-            <div className="relative rounded-xl overflow-hidden aspect-[9/16] max-w-[200px] mx-auto"
-              style={{ background: 'linear-gradient(135deg, #0D1F15 0%, #1A0D2E 100%)' }}>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                <div className="absolute inset-0 opacity-20"
-                  style={{ background: 'radial-gradient(circle at 30% 40%, #10B98133, transparent 60%), radial-gradient(circle at 70% 60%, #A855F733, transparent 60%)' }} />
-                <div className="relative text-4xl">🎬</div>
-                <div className="relative w-16 h-16 rounded-full flex items-center justify-center text-2xl border border-white/20 bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
-                  ▶
-                </div>
-                <div className="relative text-white/40 text-xs font-mono">
-                  {clip.startTime} → {clip.endTime}
-                </div>
-              </div>
-
-              {/* Fake subtitles overlay */}
-              <div className="absolute bottom-6 left-2 right-2 text-center">
-                <div className="inline-block bg-black/70 px-2 py-1 rounded text-white text-xs font-semibold">
-                  Vista previa disponible
+            {clip.downloadUrl ? (
+              <video
+                key={clip.downloadUrl}
+                src={clip.downloadUrl}
+                controls
+                autoPlay
+                playsInline
+                className="w-full rounded-xl bg-black aspect-[9/16] max-w-[280px] mx-auto object-contain"
+              />
+            ) : (
+              <div className="relative rounded-xl overflow-hidden aspect-[9/16] max-w-[280px] mx-auto flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, #0D1F15 0%, #1A0D2E 100%)' }}>
+                <div className="text-center">
+                  <div className="text-4xl mb-3">🎬</div>
+                  <p className="text-xs text-xmuted font-mono">Clip aún no disponible</p>
                 </div>
               </div>
-
-              {/* Duration badge */}
-              <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-xs font-mono text-white">
-                {formatDuration(clip.duration)}
-              </div>
-            </div>
-
-            {/* Video controls mock */}
-            <div className="mt-4 space-y-3">
-              <div className="h-1 bg-xborder rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: '0%', background: 'linear-gradient(90deg, #10B981, #A855F7)' }} />
-              </div>
-              <div className="flex items-center justify-between text-xs text-xmuted font-mono">
-                <span>0:00</span>
-                <div className="flex items-center gap-3">
-                  <button className="hover:text-white transition-colors">⏮</button>
-                  <button className="w-8 h-8 rounded-full bg-xgreen flex items-center justify-center text-bg hover:opacity-90 transition-opacity">
-                    ▶
-                  </button>
-                  <button className="hover:text-white transition-colors">⏭</button>
-                </div>
-                <span>{formatDuration(clip.duration)}</span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Right: Details */}
